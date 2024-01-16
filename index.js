@@ -14,9 +14,6 @@ const port = process.env.PORT || 3000;
 mongoose.connect(process.env.MONGO_URI)
 
 const Url = require("./models/urls.js")
-// const createAndSaveUrl = (done) => {
-//   let newUrl = new Url({ url })
-// }
 app.use(cors());
 
 app.use('/public', express.static(`${process.cwd()}/public`));
@@ -30,9 +27,13 @@ app.get('/api/hello', function(_, res) {
   res.json({ greeting: 'hello API' });
 });
 app.get('/api/shorturl/:shorturl', async function(req, res) {
-  const { shorturl } = req.params
-  const doc = await Url.findById({ _id: shorturl })
-  res.redirect(doc.url)
+  try {
+    const { shorturl } = req.params
+    const doc = await Url.findById({ _id: shorturl })
+    res.redirect(doc.url)
+  } catch (error) {
+    res.status(400).json({ error: "no short url" })
+  }
 })
 
 app.post('/api/:shorturl', async function(req, res) {
@@ -40,7 +41,7 @@ app.post('/api/:shorturl', async function(req, res) {
     const { url } = req.body;
 
     const hostname = new URL(url).hostname;
-    const isUrlValid = dns.lookup(hostname, (err, address) => {
+    const isUrlValid = dns.lookup(hostname, (err, _) => {
       if (err) {
         return false
       }
@@ -51,10 +52,10 @@ app.post('/api/:shorturl', async function(req, res) {
       const doc = await newUrl.save()
       res.json({ original_url: url, short_url: doc._id })
     } else {
-      res.json({ error: "invalid url" })
+      res.status(200).json({ error: "invalid url" })
     }
   } catch (error) {
-    res.json({ error: "invalid url" })
+    res.status(200).json({ error: "invalid url" })
   }
 })
 
