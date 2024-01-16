@@ -38,13 +38,15 @@ app.get('/api/shorturl/:shorturl', async function(req, res) {
 app.post('/api/:shorturl', async function(req, res) {
   try {
     const { url } = req.body;
-    const lookupResponse = await dns.lookup(url, function lookup(err, _, _) {
+
+    const hostname = new URL(url).hostname;
+    const isUrlValid = dns.lookup(hostname, (err, address) => {
       if (err) {
         return false
       }
       return true
     })
-    if (lookupResponse === true) {
+    if (isUrlValid) {
       let newUrl = new Url({ url })
       const doc = await newUrl.save()
       res.json({ original_url: url, short_url: doc._id })
