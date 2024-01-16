@@ -25,7 +25,7 @@ app.get('/', function(_, res) {
 });
 
 // Your first API endpoint
-app.post('/api/shorturl', function(_, res) {
+app.post('/api/shorturl', function(req, res) {
   const { url } = req.body
   dns.lookup(urlParser.parse(url).hostname, async (err, address) => {
     if (!address) {
