@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose')
 const cors = require('cors');
 const app = express();
+const dns = require("node:dns")
 
 // Basic Configuration
 const bodyParser = require('body-parser');
@@ -28,8 +29,10 @@ app.get('/', function(_, res) {
 app.get('/api/hello', function(_, res) {
   res.json({ greeting: 'hello API' });
 });
-app.get('/api/:shorturl', function(_, res) {
-  res.json({ original_url: "", short_url: "" })
+app.get('/api/shorturl/:shorturl', async function(_, res) {
+  const { shorturl } = req.params
+  const doc = await Url.findById({ _id: shorturl })
+  res.redirect(doc.url)
 })
 
 app.post('/api/:shorturl', async function(req, res) {
