@@ -13,7 +13,8 @@ const port = process.env.PORT || 3000;
 //bd Configuration
 mongoose.connect(process.env.MONGO_URI)
 
-const Url = require("./models/urls.js")
+const Url = require("./models/urls.js");
+const { log } = require('node:console');
 app.use(cors());
 
 app.use('/public', express.static(`${process.cwd()}/public`));
@@ -29,6 +30,7 @@ app.get('/api/hello', function(_, res) {
 app.get('/api/shorturl/:shorturl', async function(req, res) {
   try {
     const { shorturl } = req.params
+    console.log(shorturl)
     const doc = await Url.findById({ _id: shorturl })
     res.redirect(doc.url)
   } catch (error) {
@@ -41,8 +43,8 @@ app.post('/api/:shorturl', async function(req, res) {
     const { url } = req.body;
 
     const hostname = new URL(url).hostname;
-    const isUrlValid = dns.lookup(hostname, (err, _) => {
-      if (err) {
+    const isUrlValid = dns.lookup(hostname, (err, addr) => {
+      if (err || !addr) {
         return false
       }
       return true
