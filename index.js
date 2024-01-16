@@ -45,19 +45,20 @@ app.post('/api/:shorturl', async function(req, res) {
     const hostname = new URL(url).hostname;
     if (hostname.origin === "null") {
       res.status(200).json({ error: "invalid url" })
-    }
-    const isUrlValid = dns.lookup(hostname, (err, addr) => {
-      if (err || !addr) {
-        return false
-      }
-      return true
-    })
-    if (isUrlValid) {
-      let newUrl = new Url({ url })
-      const doc = await newUrl.save()
-      res.json({ original_url: url, short_url: doc._id })
     } else {
-      res.status(200).json({ error: "invalid url" })
+      const isUrlValid = dns.lookup(hostname, (err, addr) => {
+        if (err || !addr) {
+          return false
+        }
+        return true
+      })
+      if (isUrlValid) {
+        let newUrl = new Url({ url })
+        const doc = await newUrl.save()
+        res.json({ original_url: url, short_url: doc._id })
+      } else {
+        res.status(200).json({ error: "invalid url" })
+      }
     }
   } catch (error) {
     res.status(200).json({ error: "invalid url" })
