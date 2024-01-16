@@ -43,6 +43,9 @@ app.post('/api/:shorturl', async function(req, res) {
     const { url } = req.body;
 
     const hostname = new URL(url).hostname;
+    if (hostname.origin === "null") {
+      res.status(200).json({ error: "invalid url" })
+    }
     const isUrlValid = dns.lookup(hostname, (err, addr) => {
       if (err || !addr) {
         return false
