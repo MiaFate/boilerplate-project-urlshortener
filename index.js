@@ -38,9 +38,19 @@ app.get('/api/shorturl/:shorturl', async function(req, res) {
 app.post('/api/:shorturl', async function(req, res) {
   try {
     const { url } = req.body;
-    let newUrl = new Url({ url })
-    const doc = await newUrl.save()
-    res.json({ original_url: url, short_url: doc._id })
+    const lookupResponse = dns.lookup(url, function lookup(err, _, _) {
+      if (err) {
+        return false
+      }
+      return true
+    })
+    if (lookupResponse === true) {
+      let newUrl = new Url({ url })
+      const doc = await newUrl.save()
+      res.json({ original_url: url, short_url: doc._id })
+    } else {
+      res.json({ error: "invalid url" })
+    }
   } catch (error) {
     res.json({ error })
   }
