@@ -29,7 +29,7 @@ app.get('/', function(_, res) {
 app.get('/api/hello', function(_, res) {
   res.json({ greeting: 'hello API' });
 });
-app.get('/api/shorturl/:shorturl', async function(_, res) {
+app.get('/api/shorturl/:shorturl', async function(req, res) {
   const { shorturl } = req.params
   const doc = await Url.findById({ _id: shorturl })
   res.redirect(doc.url)
