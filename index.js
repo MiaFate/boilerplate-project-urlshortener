@@ -38,7 +38,7 @@ app.get('/api/shorturl/:shorturl', async function(req, res) {
 app.post('/api/:shorturl', async function(req, res) {
   try {
     const { url } = req.body;
-    const lookupResponse = dns.lookup(url, function lookup(err, _, _) {
+    const lookupResponse = await dns.lookup(url, function lookup(err, _, _) {
       if (err) {
         return false
       }
